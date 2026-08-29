@@ -21,6 +21,15 @@
 
 `caveman` 추가 단계: `wenyan-lite`, `wenyan-full`, `wenyan-ultra`. 기본값은 `lite`.
 
+## 원본
+
+이 저장소는 Hermes용 어댑터입니다. 스킬·도구 원본:
+
+- `caveman` — [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman)
+- `i-have-adhd` — [ayghri/i-have-adhd](https://github.com/ayghri/i-have-adhd)
+- `ponytail` — [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail)
+- `rtk-rewrite` — [rtk-ai/rtk](https://github.com/rtk-ai/rtk) (`hooks/hermes/`)
+
 ## 설치
 
 1. 플러그인 폴더 이름을 유지한 채 `$HERMES_HOME/plugins/`로 복사합니다.
