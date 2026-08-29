@@ -10,8 +10,8 @@ The desktop SuperGrok usage chip lives in a separate repo: [hermes-grok-usage](h
 
 | Folder | Version | What it does | Slash command |
 | --- | --- | --- | --- |
-| `caveman` | 0.1.0 | Injects terse “caveman” speech rules on every LLM call | `/caveman lite\|full\|ultra\|off` |
-| `i-have-adhd` | 0.1.0 | Shapes replies for ADHD: next action first, numbered steps, no fluff | `/i-have-adhd on\|off` |
+| `caveman` | 0.1.0 | Injects terse “caveman” speech rules on every LLM call | `/caveman lite` / `full` / `ultra` / `off` |
+| `i-have-adhd` | 0.1.0 | Shapes replies for ADHD: next action first, numbered steps, no fluff | `/i-have-adhd on` / `off` |
 | `ponytail` | 4.9.0 | Lazy-senior-dev mode plus review/audit/debt/gain skills | `/ponytail`, `/ponytail-review`, `/ponytail-audit`, `/ponytail-debt`, `/ponytail-gain`, `/ponytail-help` |
 | `rtk-rewrite` | 0.2.0 | Rewrites `terminal` commands through RTK before Hermes runs them. Fails open. | (hook only) |
 
