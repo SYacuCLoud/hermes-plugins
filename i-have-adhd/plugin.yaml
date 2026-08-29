@@ -1,0 +1,8 @@
+name: i-have-adhd
+version: 0.1.0
+description: Hermes · Always-on ADHD-shaped output for Hermes. v0.1.0
+author: SkyMin
+provides_hooks:
+  - pre_llm_call
+provides_commands:
+  - i-have-adhd
