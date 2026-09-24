@@ -1,0 +1,6 @@
+name: speech-core
+version: 0.1.0
+description: Hermes · One always-on block for 해요체, next action, and minimum code. v0.1.0
+author: SkyMin
+provides_hooks:
+  - pre_llm_call

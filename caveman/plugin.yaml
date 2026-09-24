@@ -1,8 +1,0 @@
-name: caveman
-version: 0.1.0
-description: Hermes · Always-on caveman compressed speech for Hermes. v0.1.0
-author: SkyMin
-provides_hooks:
-  - pre_llm_call
-provides_commands:
-  - caveman
