@@ -2,6 +2,8 @@
 
 All rewrite logic lives in RTK's Rust ``rtk rewrite`` command; this module
 only bridges Hermes ``pre_tool_call`` payloads to that command and fails open.
+A rewrite is returned as a ``{"action": "modify"}`` directive; ``args`` is
+never mutated in place.
 """
 
 import os
@@ -12,6 +14,8 @@ import sys
 ACCEPTED_REWRITE_RETURN_CODES = {0, 3}
 EXPECTED_PASSTHROUGH_RETURN_CODES = {1, 2}
 _RTK_PREFIXES = ("rtk ", ": RTK && ")
+# Hermes desktop runs without a console; keep rtk from flashing one per command.
+_CREATION_FLAGS = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 _rtk_available = None
 _rtk_missing_warned = False
 
@@ -70,7 +74,7 @@ def _already_rtk(command):
 
 
 def _pre_tool_call(tool_name=None, args=None, **_kwargs):
-    """Rewrite mutable Hermes terminal command args when RTK provides a change."""
+    """Return a modify directive when RTK rewrites a Hermes terminal command."""
     try:
         if tool_name != "terminal" or not isinstance(args, dict):
             return
@@ -89,7 +93,8 @@ def _pre_tool_call(tool_name=None, args=None, **_kwargs):
                 shell=False,
                 timeout=2,
                 capture_output=True,
-                text=True,
+                encoding="utf-8",
+                creationflags=_CREATION_FLAGS,
             )
         except subprocess.TimeoutExpired:
             _warn("rtk rewrite timed out")
@@ -101,8 +106,8 @@ def _pre_tool_call(tool_name=None, args=None, **_kwargs):
             return
 
         rewritten = result.stdout.strip()
-        if rewritten and rewritten != command:
-            args["command"] = rewritten
+        if rewritten and rewritten != command.strip():
+            return {"action": "modify", "args": {"command": rewritten}}
     except Exception as exc:
         _warn(type(exc).__name__)
         return
@@ -118,18 +123,27 @@ def _self_check():
     assert not _already_rtk("git status")
     assert _current_backend({"env_type": "docker"}) == "docker"
     assert _current_backend({"command": "ls"}) == "local"
-    os.environ["RTK_HERMES_BACKENDS"] = "local"
-    assert _backend_allowed("local")
-    assert not _backend_allowed("ssh")
-    os.environ["RTK_HERMES_BACKENDS"] = "all"
-    assert _backend_allowed("docker")
-    del os.environ["RTK_HERMES_BACKENDS"]
-    skipped = {"command": "git status", "env_type": "ssh"}
-    _pre_tool_call(tool_name="terminal", args=skipped)
-    assert skipped["command"] == "git status"
-    prefixed = {"command": "rtk git status"}
-    _pre_tool_call(tool_name="terminal", args=prefixed)
-    assert prefixed["command"] == "rtk git status"
+    saved = os.environ.pop("RTK_HERMES_BACKENDS", None)
+    try:
+        os.environ["RTK_HERMES_BACKENDS"] = "local"
+        assert _backend_allowed("local")
+        assert not _backend_allowed("ssh")
+        os.environ["RTK_HERMES_BACKENDS"] = "all"
+        assert _backend_allowed("docker")
+        del os.environ["RTK_HERMES_BACKENDS"]
+        skipped = {"command": "git status", "env_type": "ssh"}
+        assert _pre_tool_call(tool_name="terminal", args=skipped) is None
+        assert _pre_tool_call(tool_name="terminal", args={"command": "rtk git status"}) is None
+        if shutil.which("rtk"):
+            args = {"command": "git status"}
+            directive = _pre_tool_call(tool_name="terminal", args=args)
+            assert args == {"command": "git status"}
+            assert directive is None or directive["action"] == "modify"
+            print("rtk rewrite:", directive)
+    finally:
+        os.environ.pop("RTK_HERMES_BACKENDS", None)
+        if saved is not None:
+            os.environ["RTK_HERMES_BACKENDS"] = saved
     print("rtk-rewrite self-check ok")
 
 

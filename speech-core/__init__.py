@@ -23,25 +23,21 @@ When writing Korean: answer in complete 해요체 sentences. Keep particles. Do 
 """
 
 
-def _homes() -> list[Path]:
-    homes: list[Path] = []
+def _home() -> Path:
+    """Active profile home only, so a profile never borrows another profile's skills."""
     try:
         from hermes_constants import get_hermes_home
 
-        homes.append(Path(get_hermes_home()))
+        return Path(get_hermes_home())
     except Exception:
-        env = os.environ.get("HERMES_HOME", "").strip()
-        if env:
-            homes.append(Path(env))
-    homes.append(Path.home() / "AppData" / "Local" / "hermes")
-    unique: list[Path] = []
-    seen: set[str] = set()
-    for home in homes:
-        key = str(home)
-        if key not in seen:
-            seen.add(key)
-            unique.append(home)
-    return unique
+        pass
+    env = os.environ.get("HERMES_HOME", "").strip()
+    if env:
+        return Path(env)
+    local = os.environ.get("LOCALAPPDATA", "").strip()
+    if os.name == "nt" and local:
+        return Path(local) / "hermes"
+    return Path.home() / ".hermes"
 
 
 def _strip_frontmatter(text: str) -> str:
@@ -49,14 +45,13 @@ def _strip_frontmatter(text: str) -> str:
 
 
 def _skill_body(relatives: tuple[str, ...]) -> str:
-    for home in _homes():
-        for relative in relatives:
-            path = home / "skills" / relative / "SKILL.md"
-            try:
-                text = path.read_text(encoding="utf-8")
-            except OSError:
-                continue
-            return _strip_frontmatter(text)
+    skills = _home() / "skills"
+    for relative in relatives:
+        try:
+            text = (skills / relative / "SKILL.md").read_text(encoding="utf-8-sig")
+        except OSError:
+            continue
+        return _strip_frontmatter(text)
     return ""
 
 

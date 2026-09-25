@@ -1,6 +1,6 @@
 name: speech-core
-version: 0.1.2
-description: Hermes · Inject caveman, i-have-adhd, and ponytail skill text, then a Korean speech correction. v0.1.2
+version: "0.1.3"
+description: Hermes · Inject caveman, i-have-adhd, and ponytail skill text, then a Korean speech correction.
 author: SkyMin
 provides_hooks:
   - pre_llm_call
