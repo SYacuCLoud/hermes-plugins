@@ -1,6 +1,6 @@
 name: speech-core
-version: "0.1.6"
-description: Hermes · Inject caveman, i-have-adhd, and ponytail skill text, then a Korean speech correction. speech-core.skip drops names. Full bodies on first turn or after context loss, one-line reminder otherwise. v0.1.6
+version: "0.1.7"
+description: Hermes · Inject caveman, i-have-adhd, and ponytail skill text, then a Korean speech correction. speech-core.skip drops names. Full bodies on first turn or when the sent context lost them, one-line reminder otherwise. Honors stop/normal mode and /ponytail, /caveman level commands. v0.1.7
 author: SkyMin
 provides_hooks:
   - pre_llm_call
